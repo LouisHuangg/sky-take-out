@@ -35,4 +35,6 @@ public interface EmployeeMapper {
      */
     //此处使用动态sql
     Page<Employee> pageQuery(EmployeePageQueryDTO employeePageQueryDTO);
+
+    void update(Employee employee);
 }
