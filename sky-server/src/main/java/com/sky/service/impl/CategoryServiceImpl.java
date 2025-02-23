@@ -64,5 +64,14 @@ public class CategoryServiceImpl implements CategoryService {
         categoryMapper.deleteById(id);
     }
 
+    @Override
+    public void update(CategoryDTO categoryDTO) {
+        Category category = new Category();
+        BeanUtils.copyProperties(categoryDTO,category);
+        category.setUpdateTime(LocalDateTime.now());
+        category.setUpdateUser(BaseContext.getCurrentId());
+        categoryMapper.update(category);
+    }
+
 
 }
