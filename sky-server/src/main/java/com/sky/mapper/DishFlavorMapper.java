@@ -12,6 +12,5 @@ public interface DishFlavorMapper {
     //批量插入口味数据
     void insertBatch(List<DishFlavor> flavors);
 
-    @Delete("delete from sky_take_out.dish_flavor where dish_id = #{dishId}")
-    void deleteByDishId(Long dishId);
+    void deleteByDishIds(List<Long> dishIds);
 }
