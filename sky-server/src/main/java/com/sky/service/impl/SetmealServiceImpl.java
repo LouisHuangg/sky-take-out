@@ -19,6 +19,7 @@ import com.sky.vo.SetmealVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
@@ -91,8 +92,22 @@ public class SetmealServiceImpl implements SetmealService {
     }
 
     @Override
+    @Transactional
     public void update(SetmealDTO setmealDTO) {
+        Setmeal setmeal = new Setmeal();
+        BeanUtils.copyProperties(setmealDTO,setmeal);
+        //修改套餐表
+        setmealMapper.update(setmeal);
+        //先删除菜品关联 再插入
+        Long setmealId = setmeal.getId();
 
+        setmealDishMapper.deleteBySetmealId(setmealId);
+        List<SetmealDish> dishes = setmealDTO.getSetmealDishes();
+        dishes.forEach(setmealDish -> {
+            setmealDish.setSetmealId(setmealId);
+
+        });
+        setmealDishMapper.insertBatch(dishes);
     }
 
     @Override
