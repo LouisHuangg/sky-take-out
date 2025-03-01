@@ -15,6 +15,7 @@ import com.sky.mapper.SetmealDishMapper;
 import com.sky.mapper.SetmealMapper;
 import com.sky.result.PageResult;
 import com.sky.service.SetmealService;
+import com.sky.vo.SetmealVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -88,4 +89,22 @@ public class SetmealServiceImpl implements SetmealService {
         //因为套餐和菜品是一对多的关系 删除套餐 对应的关系也直接删除了
         setmealDishMapper.deleteByIds(ids);
     }
+
+    @Override
+    public void update(SetmealDTO setmealDTO) {
+
+    }
+
+    @Override
+    public SetmealVO getByIdWithDish(Long id) {
+        Setmeal setmeal = setmealMapper.getById(id);
+        List<SetmealDish> dishes = setmealDishMapper.getBySetmealId(id);
+
+        //这里就展现了vo和实体类的差别了 vo才有dishes
+        SetmealVO setmealVO = new SetmealVO();
+        BeanUtils.copyProperties(setmeal,setmealVO);
+        setmealVO.setSetmealDishes(dishes);
+        return setmealVO;
+    }
+
 }

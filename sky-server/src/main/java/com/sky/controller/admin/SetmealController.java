@@ -3,9 +3,11 @@ package com.sky.controller.admin;
 import com.github.pagehelper.Page;
 import com.sky.dto.SetmealDTO;
 import com.sky.dto.SetmealPageQueryDTO;
+import com.sky.entity.Setmeal;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.SetmealService;
+import com.sky.vo.SetmealVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.models.auth.In;
@@ -40,6 +42,7 @@ public class SetmealController {
     }
 
     @PostMapping("/status/{status}")
+    @ApiOperation("启售停售套餐")
     public Result startOrStop(@PathVariable Integer status, Long id){
         log.info("停售套餐:{}",id);
         setmealService.startOrStop(status,id);
@@ -47,9 +50,26 @@ public class SetmealController {
     }
 
     @DeleteMapping()
+    @ApiOperation("删除套餐")
     public Result delete(@RequestParam List<Long> ids){
         log.info("批量删除套餐:{}",ids);
         setmealService.delete(ids);
+        return Result.success();
+    }
+
+    @GetMapping("/{id}")
+    @ApiOperation("根据id查询套餐")
+    public Result<SetmealVO> getById(@PathVariable Long id){
+        log.info("根据id查询套餐");
+        SetmealVO setmealVO = setmealService.getByIdWithDish(id);
+        return Result.success(setmealVO);
+    }
+
+    @PutMapping
+    @ApiOperation("修改套餐")
+    public Result update(@RequestBody SetmealDTO setmealDTO){
+        log.info("修改套餐");
+        setmealService.update(setmealDTO);
         return Result.success();
     }
 }
