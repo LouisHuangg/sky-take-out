@@ -31,13 +31,26 @@
             #{id}
         </foreach>
     </delete>
-    <select id="pageQuery" resultType="com.sky.entity.Setmeal">
-        select * from sky_take_out.setmeal
+    <select id="pageQuery" resultType="com.sky.vo.SetmealVO">
+        select
+        s.*,c.name categoryName
+        from
+        setmeal s
+        left join
+        category c
+        on
+        s.category_id = c.id
         <where>
             <if test="name != null">
-                and name like concat('%', #{name}, '%')
+                and s.name like concat('%',#{name},'%')
+            </if>
+            <if test="status != null">
+                and s.status = #{status}
+            </if>
+            <if test="categoryId != null">
+                and s.category_id = #{categoryId}
             </if>
         </where>
-        order by create_time desc
+        order by s.create_time desc
     </select>
 </mapper>
