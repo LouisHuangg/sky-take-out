@@ -64,6 +64,13 @@ public class DishController {
         return Result.success();
     }
 
+    @PostMapping("/status/{status}")
+    public Result startOrStop(@PathVariable Integer status, Long id){
+        log.info("停售菜品:{}",id);
+        dishService.startOrStop(status,id);
+        return Result.success();
+    }
+
     @GetMapping("/list")
     @ApiOperation("根据分类id查询菜品")
     public Result<List<Dish>> list(Long categoryId){

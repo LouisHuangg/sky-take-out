@@ -8,6 +8,7 @@ import com.sky.result.Result;
 import com.sky.service.SetmealService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -34,5 +35,12 @@ public class SetmealController {
         log.info("分页查询:{}",setmealPageQueryDTO);
         PageResult pageResult = setmealService.page(setmealPageQueryDTO);
         return Result.success(pageResult);
+    }
+
+    @PostMapping("/status/{status}")
+    public Result startOrStop(@PathVariable Integer status, Long id){
+        log.info("停售套餐:{}",id);
+        setmealService.startOrStop(status,id);
+        return Result.success();
     }
 }

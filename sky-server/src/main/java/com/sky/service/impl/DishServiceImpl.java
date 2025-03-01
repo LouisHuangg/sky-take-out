@@ -121,4 +121,11 @@ public class DishServiceImpl implements DishService {
         Dish dish = Dish.builder().categoryId(categoryId).status(StatusConstant.ENABLE).build();
         return dishMapper.list(dish);
     }
+
+    @Override
+    public void startOrStop(Integer status, Long id) {
+        //菜品可以直接起售停售
+        Dish dish = Dish.builder().status(status).id(id).build();
+        dishMapper.update(dish);
+    }
 }
