@@ -29,4 +29,9 @@ public interface SetmealMapper {
     Page<Setmeal> pageQuery(SetmealPageQueryDTO setmealPageQueryDTO);
 
     void update(Setmeal setmeal);
+
+    @Select("select * from sky_take_out.setmeal where id = #{id}")
+    Setmeal getById(Long id);
+
+    void deleteByIds(List<Long> ids);
 }

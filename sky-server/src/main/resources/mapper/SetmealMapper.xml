@@ -25,6 +25,12 @@
         </set>
         where id = #{id}
     </update>
+    <delete id="deleteByIds">
+        delete from sky_take_out.setmeal where id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
     <select id="pageQuery" resultType="com.sky.entity.Setmeal">
         select * from sky_take_out.setmeal
         <where>

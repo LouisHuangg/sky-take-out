@@ -70,4 +70,22 @@ public class SetmealServiceImpl implements SetmealService {
         Setmeal setmeal = Setmeal.builder().status(status).id(id).build();
         setmealMapper.update(setmeal);
     }
+
+    @Override
+    public void delete(List<Long> ids) {
+        //判断是否起售
+        for (Long id : ids) {
+            Setmeal setmeal = setmealMapper.getById(id);
+            if (setmeal.getStatus().equals(StatusConstant.ENABLE)){
+                throw new DeletionNotAllowedException(MessageConstant.SETMEAL_ON_SALE);
+            }
+        }
+        //删除菜品套餐对应关系
+        //这里为了性能最好还是全部传进去执行1次sql 而不是用循环
+        setmealMapper.deleteByIds(ids);
+
+        //这里为什么不用像菜品那样先做个关系判断
+        //因为套餐和菜品是一对多的关系 删除套餐 对应的关系也直接删除了
+        setmealDishMapper.deleteByIds(ids);
+    }
 }
