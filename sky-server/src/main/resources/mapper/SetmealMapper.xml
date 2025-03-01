@@ -10,4 +10,13 @@
         values (#{categoryId}, #{name}, #{price}, #{status}, #{description}, #{image}, #{createTime}, #{updateTime},
                 #{createUser}, #{updateUser})
     </insert>
+    <select id="pageQuery" resultType="com.sky.entity.Setmeal">
+        select * from sky_take_out.setmeal
+        <where>
+            <if test="name != null">
+                and name like concat('%', #{name}, '%')
+            </if>
+        </where>
+        order by create_time desc
+    </select>
 </mapper>
