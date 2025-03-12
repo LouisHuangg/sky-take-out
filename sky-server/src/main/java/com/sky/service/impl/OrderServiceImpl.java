@@ -311,6 +311,20 @@ public class OrderServiceImpl implements OrderService {
         orderMapper.update(order);
     }
 
+    @Override
+    public void delivery(Long id) {
+        //把订单状态修改为派送中
+        Orders orders = orderMapper.getById(id);
+        if (orders != null && !orders.getStatus().equals(Orders.CONFIRMED)){
+            //要接单才能派送
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+        Orders order = new Orders();
+        order.setId(id);
+        order.setStatus(Orders.DELIVERY_IN_PROGRESS);
+        orderMapper.update(order);
+    }
+
     private List<OrderVO> getOrderVOList(Page<Orders> page){
         List<OrderVO> orderVOList = new ArrayList<>();
         List<Orders> ordersList = page.getResult();
