@@ -17,6 +17,7 @@ import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
+import com.sky.websocket.WebSocketServer;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.ConnectionUtils;
@@ -26,7 +27,9 @@ import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,6 +49,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private WebSocketServer webSocketServer;
 
     @Override
     @Transactional
@@ -147,6 +153,15 @@ public class OrderServiceImpl implements OrderService {
                 .build();
 
         orderMapper.update(orders);
+
+        //通过websocket向客户端推送消息
+        Map map = new HashMap<>();
+        map.put("type","2");//1来单 2催单
+        map.put("orderId",ordersDB.getId());
+        map.put("content","订单号:" + outTradeNo);
+
+        String json = JSONObject.toJSONString(map);
+        webSocketServer.sendToAllClient(json);
     }
 
     @Override
@@ -315,13 +330,28 @@ public class OrderServiceImpl implements OrderService {
     public void delivery(Long id) {
         //把订单状态修改为派送中
         Orders orders = orderMapper.getById(id);
-        if (orders != null && !orders.getStatus().equals(Orders.CONFIRMED)){
+        if (orders == null || !orders.getStatus().equals(Orders.CONFIRMED)){
             //要接单才能派送
             throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
         }
         Orders order = new Orders();
         order.setId(id);
         order.setStatus(Orders.DELIVERY_IN_PROGRESS);
+        orderMapper.update(order);
+    }
+
+    @Override
+    public void complete(Long id) {
+        Orders orders = orderMapper.getById(id);
+
+        if (orders == null || !orders.getStatus().equals(Orders.DELIVERY_IN_PROGRESS)){
+            //派送中的订单才能完成
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+        Orders order = new Orders();
+        order.setId(id);
+        order.setStatus(Orders.COMPLETED);
+        order.setDeliveryTime(LocalDateTime.now());
         orderMapper.update(order);
     }
 
