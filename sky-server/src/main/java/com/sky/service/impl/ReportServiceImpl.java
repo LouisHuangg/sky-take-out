@@ -1,10 +1,12 @@
 package com.sky.service.impl;
 
+import com.sky.dto.GoodsSalesDTO;
 import com.sky.entity.Orders;
 import com.sky.mapper.OrderMapper;
 import com.sky.mapper.UserMapper;
 import com.sky.service.ReportService;
 import com.sky.vo.OrderReportVO;
+import com.sky.vo.SalesTop10ReportVO;
 import com.sky.vo.TurnoverReportVO;
 import com.sky.vo.UserReportVO;
 import io.swagger.models.auth.In;
@@ -20,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -116,6 +119,20 @@ public class ReportServiceImpl implements ReportService {
                 .orderCountList(StringUtils.join(totalOrdersList,","))
                 .validOrderCountList(StringUtils.join(validOrdersList,","))
                 .totalOrderCount(allOrders).validOrderCount(validAllOrders).orderCompletionRate(orderCompletionRate).build();
+    }
+
+    @Override
+    public SalesTop10ReportVO getTopTen(LocalDate begin, LocalDate end) {
+        //同时涉及到order_detail和order
+        //order状态为已完成的才能参与统计
+        LocalDateTime beginTime = LocalDateTime.of(begin,LocalTime.MIN);
+        LocalDateTime endTime = LocalDateTime.of(end,LocalTime.MAX);
+        List<GoodsSalesDTO> salesTopTen = orderMapper.getSalesTopTen(beginTime, endTime);
+        List<String> names = salesTopTen.stream().map(GoodsSalesDTO::getName).collect(Collectors.toList());
+        String nameList = StringUtils.join(names,",");
+        List<Integer> numbers = salesTopTen.stream().map(GoodsSalesDTO::getNumber).collect(Collectors.toList());
+        String numberList = StringUtils.join(numbers,",");
+        return SalesTop10ReportVO.builder().nameList(nameList).numberList(numberList).build();
     }
 
     private Integer getOrdersCount(LocalDateTime begin, LocalDateTime end, Integer status){
